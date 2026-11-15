@@ -1,0 +1,83 @@
+# HanLane runtime configuration. Thresholds live here, not in code.
+# Secrets and endpoints live in .env (see .env.example).
+
+[ttl]
+telemetry_seconds = 7200        # revisit after measure_m0.py (day 1)
+rsu_readings_seconds = 21600
+events_seconds = 604800         # 7 days, applied through events.expireAt
+probe_events_seconds = 3600     # probes are high volume, keep them short
+advisories_seconds = 604800
+rollups_seconds = 259200        # 3 days
+
+[sim]
+net_file = "sim/net/danang.net.xml.gz"
+route_file = "sim/net/danang.rou.xml.gz"
+flows_file = "sim/net/bridge.flows.xml"
+meta_file = "sim/net/meta.json"
+vtypes_file = "sim/vtypes.add.xml"
+zones_file = "sim/net/edge_zones.json"
+step_length = 0.2
+lateral_resolution = 0.8
+seed = 42
+scale = 0.3                     # demand multiplier: 1.0 = ~200 vehicles, 0.3 = ~60
+gps_noise_m = 3.0
+control_port = 8100
+batch_timeout_s = 2.0
+# OSM bounding box: south, west, north, east (Han river centre, both banks)
+bbox = [16.0500, 108.2120, 16.0750, 108.2400]
+
+[incident]
+default_edge = ""               # empty: use incident_edge from sim/net/meta.json (Dragon Bridge)
+decel = 8.0                     # m/s^2 used to brake the incident vehicle
+
+[[zones]]
+name = "cau-rong"
+# lon_min, lat_min, lon_max, lat_max
+bbox = [108.2245, 16.0595, 108.2320, 16.0628]
+[[zones]]
+name = "cau-song-han"
+bbox = [108.2240, 16.0705, 108.2295, 16.0735]
+[[zones]]
+name = "cau-tran-thi-ly"
+bbox = [108.2270, 16.0485, 108.2345, 16.0525]
+[[zones]]
+name = "son-tra"
+bbox = [108.2290, 16.0400, 108.2600, 16.0800]
+[[zones]]
+name = "hai-chau"
+bbox = [108.1900, 16.0400, 108.2290, 16.0800]
+
+[rules]
+hard_brake_accel = { motorbike = -6.0, car = -6.0, bus = -5.0 }
+stalled_speed = 0.5             # m/s
+stalled_seconds = 10
+stalled_leader_clear_m = 30.0   # no stopped vehicle ahead within this distance
+stalled_tls_dist_m = 50.0       # ignore vehicles waiting at a red light closer than this
+stalled_junction_clear_m = 15.0 # ignore vehicles waiting to yield this close to the end of the lane
+lane_jam_ratio = 0.30           # mean lane speed below this share of the limit
+lane_jam_seconds = 60
+lane_jam_min_vehicles = 3
+close_speed = 2.0               # event closes when the vehicle moves above this
+close_seconds = 3
+
+[recipients]
+radius_m = 150.0
+min_headway_s = 2.0             # closer than this is collision avoidance, out of scope
+adjacent_lane_clear_m = 15.0
+slowdown_factor = 0.5           # target speed as share of current speed
+slowdown_min_speed = 3.0        # m/s
+slowdown_seconds = { HARD_BRAKE = 3.0, STALLED = 4.0, LANE_JAM = 5.0 }
+change_lane_seconds = 5.0
+
+[budget_ms]
+t0_t1 = 50
+t1_t3 = 30
+t3_t4 = 400
+t4_send = 100
+send_t5 = 200
+total = 780
+
+[loop]
+# Gateway also POSTs each event to the worker (it still writes `events`). Enabled because the
+# measured change stream p95 (t3->t4) on the shared tier was ~540 ms, over the 400 ms budget.
+fast_path = true

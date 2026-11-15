@@ -1,0 +1,9 @@
+.venv
+.env
+.git
+logs
+web/node_modules
+web/dist
+sim/output
+sim/osm
+**/__pycache__

@@ -1,0 +1,72 @@
+services:
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: hanlane-dd-agent
+    environment:
+      DD_API_KEY: ${DD_API_KEY:?DD_API_KEY missing in .env}
+      DD_SITE: ${DD_SITE:-ap1.datadoghq.com}
+      DD_ENV: ${DD_ENV:-hackathon}
+      DD_HOSTNAME: hanlane-dev
+      DD_APM_ENABLED: "true"
+      DD_APM_NON_LOCAL_TRAFFIC: "true"
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: "true"
+      DD_LOGS_ENABLED: "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "false"
+      DD_PROCESS_AGENT_ENABLED: "false"
+      DD_CONTAINER_EXCLUDE: "name:hanlane-dd-agent"
+    ports:
+      - "8126:8126/tcp"
+      - "8125:8125/udp"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - ./logs:/hanlane-logs:ro
+      - ./datadog/agent/conf.d/hanlane.d:/etc/datadog-agent/conf.d/hanlane.d:ro
+    restart: unless-stopped
+
+  # Optional containerised services (demo path runs them on the host; see Makefile).
+  gateway:
+    profiles: ["app"]
+    build: .
+    env_file: .env
+    environment:
+      DD_SERVICE: hanlane-gateway
+      DD_PYMONGO_SERVICE: hanlane-gateway-mongodb
+      DD_ENV: ${DD_ENV:-hackathon}
+      DD_VERSION: ${DD_VERSION:-dev}
+      DD_AGENT_HOST: datadog-agent
+      DD_LOGS_INJECTION: "true"
+      HANLANE_LOG_FILE: "0"
+      SIM_CONTROL_URL: http://host.docker.internal:8100
+      WORKER_URL: http://worker:8200
+    labels:
+      com.datadoghq.tags.service: hanlane-gateway
+      com.datadoghq.tags.env: ${DD_ENV:-hackathon}
+      com.datadoghq.tags.version: ${DD_VERSION:-dev}
+      com.datadoghq.ad.logs: '[{"source": "python", "service": "hanlane-gateway"}]'
+    command: ["ddtrace-run", "uvicorn", "gateway.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    depends_on: [datadog-agent]
+
+  worker:
+    profiles: ["app"]
+    build: .
+    env_file: .env
+    environment:
+      DD_SERVICE: hanlane-worker
+      DD_PYMONGO_SERVICE: hanlane-worker-mongodb
+      DD_ENV: ${DD_ENV:-hackathon}
+      DD_VERSION: ${DD_VERSION:-dev}
+      DD_AGENT_HOST: datadog-agent
+      DD_LOGS_INJECTION: "true"
+      HANLANE_LOG_FILE: "0"
+      SIM_CONTROL_URL: http://host.docker.internal:8100
+    labels:
+      com.datadoghq.tags.service: hanlane-worker
+      com.datadoghq.tags.env: ${DD_ENV:-hackathon}
+      com.datadoghq.tags.version: ${DD_VERSION:-dev}
+      com.datadoghq.ad.logs: '[{"source": "python", "service": "hanlane-worker"}]'
+    command: ["ddtrace-run", "python", "-m", "worker.main"]
+    depends_on: [datadog-agent]

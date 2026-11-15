@@ -1,0 +1,72 @@
+{
+  "measured_at": "2026-11-15T16:36:54.530646+00:00",
+  "current_ttl_seconds": 7200,
+  "sweep": {
+    "insert_many_50_per_s": {
+      "attempted_ops": 12,
+      "ok_ops": 12,
+      "errors": 0,
+      "error_sample": [],
+      "elapsed_s": 12.0,
+      "achieved_ops_per_s": 1.0,
+      "latency_ms": {
+        "p50": 144.9,
+        "p95": 227.3,
+        "max": 631.9
+      },
+      "longest_gap_between_completions_s": 1.53,
+      "server_counters_delta": {
+        "insert": 600,
+        "command": 2,
+        "query": 0,
+        "numRequests": 14,
+        "bytesIn": 255816
+      },
+      "documents": 600
+    },
+    "insert_many_100_per_s": {
+      "attempted_ops": 12,
+      "ok_ops": 12,
+      "errors": 0,
+      "error_sample": [],
+      "elapsed_s": 12.0,
+      "achieved_ops_per_s": 1.0,
+      "latency_ms": {
+        "p50": 914.6,
+        "p95": 918.7,
+        "max": 1086.9
+      },
+      "longest_gap_between_completions_s": 1.09,
+      "server_counters_delta": {
+        "insert": 1200,
+        "command": 2,
+        "query": 0,
+        "numRequests": 14,
+        "bytesIn": 508429
+      },
+      "documents": 1200
+    },
+    "insert_many_200_per_s": {
+      "attempted_ops": 12,
+      "ok_ops": 12,
+      "errors": 0,
+      "error_sample": [],
+      "elapsed_s": 12.0,
+      "achieved_ops_per_s": 1.0,
+      "latency_ms": {
+        "p50": 935.7,
+        "p95": 997.9,
+        "max": 1414.1
+      },
+      "longest_gap_between_completions_s": 1.48,
+      "server_counters_delta": {
+        "insert": 2400,
+        "command": 2,
+        "query": 0,
+        "numRequests": 14,
+        "bytesIn": 1013629
+      },
+      "documents": 2400
+    }
+  }
+}

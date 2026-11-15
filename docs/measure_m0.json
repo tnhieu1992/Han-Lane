@@ -1,0 +1,78 @@
+{
+  "measured_at": "2026-11-15T16:34:09.343218+00:00",
+  "current_ttl_seconds": 7200,
+  "storage": {
+    "storageSize_mb": 0.91,
+    "dataSize_mb": 1.29,
+    "indexSize_mb": 2.52,
+    "buckets": 578,
+    "records": 13789,
+    "avg_record_bson_bytes": 419.8,
+    "disk_bytes_per_record": 248.7,
+    "compression_ratio": 1.69,
+    "mb_per_hour_50_vehicles": 44.8,
+    "mb_per_hour_300_vehicles": 268.6,
+    "suggested_ttl_seconds_300_vehicles": 3000
+  },
+  "bytes": {
+    "batch_50": {
+      "bson_bytes": 19890,
+      "zstd_bytes": 5230,
+      "ratio": 3.8,
+      "gb_per_7d_if_24h": 3.16,
+      "gb_per_7d_if_3h_per_day": 0.4
+    },
+    "batch_300": {
+      "bson_bytes": 121055,
+      "zstd_bytes": 26188,
+      "ratio": 4.62,
+      "gb_per_7d_if_24h": 15.84,
+      "gb_per_7d_if_3h_per_day": 1.98
+    }
+  },
+  "writes": {
+    "single_150_per_s": {
+      "attempted_ops": 4500,
+      "ok_ops": 4500,
+      "errors": 0,
+      "error_sample": [],
+      "elapsed_s": 63.8,
+      "achieved_ops_per_s": 70.5,
+      "latency_ms": {
+        "p50": 894.0,
+        "p95": 1199.5,
+        "max": 50822.3
+      },
+      "longest_gap_between_completions_s": 1.35,
+      "server_counters_delta": {
+        "insert": 4500,
+        "command": 196,
+        "query": 0,
+        "numRequests": 4696,
+        "bytesIn": 3066902
+      }
+    },
+    "insert_many_300_per_s": {
+      "attempted_ops": 30,
+      "ok_ops": 30,
+      "errors": 0,
+      "error_sample": [],
+      "elapsed_s": 56.2,
+      "achieved_ops_per_s": 0.5,
+      "latency_ms": {
+        "p50": 1994.9,
+        "p95": 2130.4,
+        "max": 3531.9
+      },
+      "longest_gap_between_completions_s": 3.54,
+      "server_counters_delta": {
+        "insert": 9000,
+        "command": 6,
+        "query": 0,
+        "numRequests": 36,
+        "bytesIn": 3796938
+      },
+      "documents": 9000
+    }
+  }
+}

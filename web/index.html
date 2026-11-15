@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HanLane · Đà Nẵng</title>
+  </head>
+  <body>
+    <div id="map"></div>
+    <aside id="panel">
+      <header>
+        <div class="brand">HanLane <span>· Đà Nẵng</span></div>
+        <div id="conn" class="conn off">offline</div>
+      </header>
+
+      <section class="kpis">
+        <div class="kpi"><label>Xe đang chạy</label><b id="k-vehicles">–</b></div>
+        <div class="kpi"><label>Sự cố mở</label><b id="k-open">–</b></div>
+        <div class="kpi wide"><label>Vòng phản hồi t0→t5 (p95 / p50)</label><b id="k-loop">–</b><small id="k-loop-n"></small></div>
+        <div class="kpi wide"><label>Ghi MongoDB</label><b id="k-write">–</b><small id="k-write-detail"></small></div>
+        <div class="kpi"><label>Giờ giả lập</label><b id="k-sim">–</b></div>
+        <div class="kpi"><label>Cảnh báo</label><b id="k-adv">–</b></div>
+      </section>
+
+      <section class="controls">
+        <button id="b-incident" class="danger">Tạo sự cố · Cầu Rồng</button>
+        <button id="b-clear">Dọn sự cố</button>
+        <div class="row">
+          <button id="b-adv" class="toggle">Cảnh báo: –</button>
+          <button id="b-write" class="toggle">WRITE_MODE: –</button>
+        </div>
+        <div class="row">
+          <button id="b-scale1" class="toggle">Lưu lượng ×1</button>
+          <button id="b-scale3" class="toggle">Lưu lượng ×3</button>
+        </div>
+        <button id="b-fly" class="ghost">Về cầu Rồng</button>
+      </section>
+
+      <section class="feed">
+        <h3>Sự kiện</h3>
+        <ol id="feed"></ol>
+      </section>
+
+      <footer>Chỉ đọc từ gateway qua WebSocket · không truy vấn Atlas</footer>
+    </aside>
+
+    <div id="legend">
+      <span><i style="background: var(--moto)"></i>Xe máy</span>
+      <span><i style="background: var(--car)"></i>Ô tô</span>
+      <span><i style="background: var(--bus)"></i>Xe buýt</span>
+      <span><i style="background: var(--advised)"></i>Đã nhận cảnh báo</span>
+      <span><i style="background: var(--incident)"></i>Sự cố</span>
+    </div>
+    <div id="toast"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+pymongo[zstd]>=4.17,<4.18   # ddtrace 3.x cannot patch 4.18+ (Server.run_operation removed)
+ddtrace>=3,<4
+datadog>=0.50,<1
+datadog-api-client>=2.30,<3
+pydantic-settings>=2.4,<3
+httpx>=0.27,<1
+sumolib>=1.20
+pyproj>=3.6
