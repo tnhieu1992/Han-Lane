@@ -1,0 +1,233 @@
+{
+  "title": "HanLane · real-time hazard warnings",
+  "description": "Feedback loop from the triggering record (t0) to the vehicle applying the command (t5), ingest into MongoDB Atlas, and incidents. Managed by scripts/dd_apply.py; do not edit in the UI.",
+  "layout_type": "ordered",
+  "reflow_type": "auto",
+  "template_variables": [{ "name": "env", "prefix": "env", "available_values": [], "default": "hackathon" }],
+  "widgets": [
+    {
+      "definition": {
+        "type": "group", "title": "Feedback loop t0 → t5 (SLO: p95 < 1 s)", "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "query_value", "title": "Loop p95 (ms, last 5 min)", "precision": 0, "autoscale": false,
+              "requests": [{
+                "response_format": "scalar",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p95:hanlane.loop.latency_ms{$env}", "aggregator": "avg" }],
+                "formulas": [{ "formula": "q" }],
+                "conditional_formats": [
+                  { "comparator": "<", "value": 800, "palette": "white_on_green" },
+                  { "comparator": "<", "value": 1000, "palette": "white_on_yellow" },
+                  { "comparator": ">=", "value": 1000, "palette": "white_on_red" }
+                ]
+              }],
+              "time": { "live_span": "5m" }
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value", "title": "Loop p50 (ms, last 5 min)", "precision": 0, "autoscale": false,
+              "requests": [{
+                "response_format": "scalar",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p50:hanlane.loop.latency_ms{$env}", "aggregator": "avg" }],
+                "formulas": [{ "formula": "q" }]
+              }],
+              "time": { "live_span": "5m" }
+            }
+          },
+          {
+            "definition": {
+              "type": "slo", "title": "SLO: loop p95 < 1 s per minute", "view_type": "detail",
+              "slo_id": "${SLO_ID}", "time_windows": ["7d", "previous_week"], "show_error_budget": true,
+              "view_mode": "overall", "global_time_target": "0"
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "Loop latency p50 / p95 / p99 (ms)", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [
+                  { "data_source": "metrics", "name": "p50", "query": "p50:hanlane.loop.latency_ms{$env}" },
+                  { "data_source": "metrics", "name": "p95", "query": "p95:hanlane.loop.latency_ms{$env}" },
+                  { "data_source": "metrics", "name": "p99", "query": "p99:hanlane.loop.latency_ms{$env}" }
+                ],
+                "formulas": [{ "formula": "p50", "alias": "p50" }, { "formula": "p95", "alias": "p95" }, { "formula": "p99", "alias": "p99" }],
+                "display_type": "line"
+              }],
+              "markers": [
+                { "value": "y = 1000", "display_type": "error dashed", "label": "SLO 1000 ms" },
+                { "value": "y = 780", "display_type": "warning dashed", "label": "budget 780 ms" }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "p95 per hop vs budget (ms)", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p95:hanlane.segment_ms{$env} by {segment}" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "line"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "t3 → t4: change stream lag vs fast path (p95 ms)", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [
+                  { "data_source": "metrics", "name": "cs", "query": "p95:hanlane.changestream.lag_ms{$env}" },
+                  { "data_source": "metrics", "name": "fast", "query": "p95:hanlane.segment_ms{$env,segment:t3_t4,path:fast}" }
+                ],
+                "formulas": [{ "formula": "cs", "alias": "change stream" }, { "formula": "fast", "alias": "fast path" }],
+                "display_type": "line"
+              }],
+              "markers": [{ "value": "y = 400", "display_type": "warning dashed", "label": "budget 400 ms" }]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "Detection lag t0 → t3 by event type (p95 ms)", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p95:hanlane.detect.lag_ms{$env} by {event_type}" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "line"
+              }]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "group", "title": "Ingest and MongoDB Atlas (M0)", "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries", "title": "Telemetry records received per type", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "sum:hanlane.telemetry.received{$env} by {vehicle_type}.as_count()" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "bars"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value", "title": "Vehicles active", "precision": 0,
+              "requests": [{
+                "response_format": "scalar",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "avg:hanlane.vehicles.active{$env,service:hanlane-gateway}", "aggregator": "last" }],
+                "formulas": [{ "formula": "q" }]
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "MongoDB write time and ingest lag t0 → t2 (p95 ms)", "show_legend": true,
+              "markers": [{ "value": "y = 5000", "display_type": "error dashed", "label": "ingest lag monitor 5 s" }],
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [
+                  { "data_source": "metrics", "name": "w", "query": "p95:hanlane.mongo.write_ms{$env} by {write_mode}" },
+                  { "data_source": "metrics", "name": "l", "query": "p95:hanlane.ingest.lag_ms{$env} by {write_mode}" }
+                ],
+                "formulas": [{ "formula": "w", "alias": "write" }, { "formula": "l", "alias": "ingest lag" }],
+                "display_type": "line"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "Batches waiting to be written / dropped", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [
+                  { "data_source": "metrics", "name": "p", "query": "max:hanlane.mongo.pending_batches{$env} by {write_mode}" },
+                  { "data_source": "metrics", "name": "d", "query": "sum:hanlane.telemetry.dropped{$env}.as_count()" }
+                ],
+                "formulas": [{ "formula": "p", "alias": "pending" }, { "formula": "d", "alias": "dropped" }],
+                "display_type": "bars"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "Gateway PyMongo span p95 (s)", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p95:trace.pymongo.cmd{$env,service:hanlane-gateway-mongodb}" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "line"
+              }],
+              "markers": [{ "value": "y = 1.5", "display_type": "error dashed", "label": "monitor 1.5 s" }]
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value", "title": "Batch size p50 (documents per insert_many)", "precision": 0,
+              "requests": [{
+                "response_format": "scalar",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "p50:hanlane.mongo.batch_size{$env}", "aggregator": "avg" }],
+                "formulas": [{ "formula": "q" }]
+              }]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "group", "title": "Incidents and advisories", "layout_type": "ordered",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries", "title": "Incidents detected by type", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "sum:hanlane.events.detected{$env} by {event_type}.as_count()" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "bars"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "toplist", "title": "Incidents by zone (last 1 h)",
+              "requests": [{
+                "response_format": "scalar",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "sum:hanlane.events.detected{$env} by {zone}.as_count()", "aggregator": "sum" }],
+                "formulas": [{ "formula": "q", "limit": { "count": 10, "order": "desc" } }]
+              }],
+              "time": { "live_span": "1h" }
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries", "title": "Advisories sent by action", "show_legend": true,
+              "requests": [{
+                "response_format": "timeseries",
+                "queries": [{ "data_source": "metrics", "name": "q", "query": "sum:hanlane.advisory.sent{$env} by {action}.as_count()" }],
+                "formulas": [{ "formula": "q" }],
+                "display_type": "bars"
+              }]
+            }
+          },
+          {
+            "definition": {
+              "type": "log_stream", "title": "Incident log (detected, advisory applied)",
+              "query": "service:(hanlane-gateway OR hanlane-sim) (\"event detected\" OR \"advisory applied\" OR \"event closed\")",
+              "indexes": [], "columns": ["service", "message"], "show_date_column": true, "show_message_column": true,
+              "message_display": "inline", "sort": { "column": "time", "order": "desc" }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

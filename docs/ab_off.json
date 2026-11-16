@@ -1,0 +1,25 @@
+{
+  "advisories": "off",
+  "seed": 42,
+  "scale": 0.3,
+  "incident_at": 300.0,
+  "incident": {
+    "edge": "295386151",
+    "phase": "stopped",
+    "requested": 300.0,
+    "vid": "moto-20c7c8",
+    "start_speed": 16.7,
+    "stopped_at": 302.2,
+    "pos": 197.2958224468917,
+    "lane": "295386151_0"
+  },
+  "followers": 52,
+  "emergency_brakers": 9,
+  "harsh_brakers": 15,
+  "min_gap_m": 0.0,
+  "min_headway_s": 0.0,
+  "collisions": 0,
+  "advisory_events_applied": 0,
+  "warned_followers": 0,
+  "loop_p95_ms": 200.289
+}

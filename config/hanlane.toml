@@ -81,3 +81,6 @@ total = 780
 # Gateway also POSTs each event to the worker (it still writes `events`). Enabled because the
 # measured change stream p95 (t3->t4) on the shared tier was ~540 ms, over the 400 ms budget.
 fast_path = true
+# The worker drops events older than this instead of sending a stale warning (e.g. change stream
+# replay after a restart). Counted as hanlane.advisory.stale.
+stale_after_ms = 3000

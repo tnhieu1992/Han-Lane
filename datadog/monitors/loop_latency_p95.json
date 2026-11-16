@@ -1,0 +1,14 @@
+{
+  "name": "[HanLane] Feedback loop p95 above 800 ms",
+  "type": "query alert",
+  "query": "percentile(last_2m):p95:hanlane.loop.latency_ms{env:hackathon} > 800",
+  "message": "p95 of t5 - t0 is {{value}} ms over the last 2 minutes (budget 780 ms, SLO 1000 ms).\nCheck hanlane.segment_ms by segment on the HanLane dashboard to see which hop is slow.",
+  "options": {
+    "thresholds": { "critical": 800, "warning": 600 },
+    "notify_no_data": false,
+    "include_tags": false,
+    "renotify_interval": 0
+  },
+  "tags": ["service:hanlane", "env:hackathon", "team:hanlane"],
+  "priority": 2
+}

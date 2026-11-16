@@ -1,0 +1,13 @@
+{
+  "name": "[HanLane] Telemetry ingest lag above 5 s",
+  "type": "query alert",
+  "query": "avg(last_2m):avg:hanlane.ingest.lag_ms{env:hackathon} > 5000",
+  "message": "Telemetry reaches MongoDB {{value}} ms after it was read (t0 -> t2, 2 min average); normal is 0.2-0.5 s. MongoDB is not keeping up: Atlas M0 throttles around 100 documents per second. Check WRITE_MODE (single writes one document per call) and the vehicle count. Incident warnings are not affected: they have their own write path.",
+  "options": {
+    "thresholds": { "critical": 5000, "warning": 2000 },
+    "notify_no_data": false,
+    "include_tags": false
+  },
+  "tags": ["service:hanlane-gateway", "env:hackathon", "team:hanlane"],
+  "priority": 2
+}

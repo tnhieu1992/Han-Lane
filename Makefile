@@ -49,6 +49,9 @@ web:             ## run the web map (Vite dev server, port 5180)
 demo:            ## agent + gateway + worker + sim + web in one go (Ctrl-C stops all)
 	./scripts/demo.sh
 
+stop:            ## stop gateway, worker, sim and web on the host (the Datadog Agent keeps running)
+	-pkill -f "sim.bridge"; pkill -f "gateway.app:app"; pkill -f "worker.main"; pkill -f "vite --host"; true
+
 measure:
 	$(RUN) hanlane-measure $(PY) scripts/measure_m0.py
 

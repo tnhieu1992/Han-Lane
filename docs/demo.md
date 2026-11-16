@@ -1,6 +1,6 @@
 # Demo script (6 minutes)
 
-One incident on the Dragon Bridge, seen from three angles: the map, Datadog, and the scale story. Follows chapter 11 of `HanLane_ho-so-y-tuong.pdf`. The live part is in the middle; the load test is shown as a recording because monitors need a few minutes to fire.
+One incident on the Dragon Bridge, seen from three angles: the map, Datadog, and the scale story. The live part is in the middle; the load test is shown as a recording because monitors need a few minutes to fire.
 
 ## Before going on stage (T-15 min)
 
@@ -26,11 +26,13 @@ make dd-status                # monitors OK, no leftover alerts
 | 1:30–3:15 | Live map | ~60 vehicles on real Da Nang streets (85% motorbikes). Click **Tạo sự cố · Cầu Rồng**: a vehicle brakes hard, stops, hazard lights on. Vehicles behind turn orange (slow down, change lane). Point at the panel: loop p95 ~200 ms. Then show `docs/ab_results.md` (advisories off vs on). Click **Dọn sự cố**. |
 | 3:15–4:30 | Datadog | Open the trace of that incident: sim → gateway → `rules.fire` → MongoDB insert → worker → sim, one trace across the change stream. Dashboard: loop p50/p95, per-hop budget, change stream vs fast path, SLO always fed by the 1 Hz probe. Play the load-test recording: x3 traffic + `WRITE_MODE=single`, write time climbs, MongoDB monitor fires, switch back and it recovers. |
 | 4:30–5:20 | Slide: scale | Measured numbers: ~100 documents/s write ceiling on the free tier, 249 bytes per record, 2 h TTL; what an M10+ cluster, sharding by zone and Atlas Stream Processing change. |
-| 5:20–6:00 | Claude Code (optional) | Ask through Datadog MCP "why did latency rise just now?" (cut first if short on time; not set up in this repo). Closing line. |
+| 5:20–6:00 | Datadog MCP (optional) | Ask Datadog through MCP "why did latency rise just now?" (cut first if short on time; not set up in this repo). Closing line. |
 
 ## Numbers to quote
 
-From `README.md` and `docs/decisions.md`: loop p95 ~200 ms (fast path) and change stream p95 ~540 ms on the shared tier; detection under 10 ms; `insert_many` of 50 docs p50 145 ms; write ceiling ~100 docs/s; 249 bytes per record on disk.
+From `docs/results.md`: loop p95 ~200 ms (fast path) and change stream p95 ~540 ms on the shared tier; detection under 10 ms; `insert_many` of 50 docs p50 145 ms; write ceiling ~100 docs/s; 249 bytes per record on disk. A/B (same incident, same seed, 52 vehicles behind): harsh braking 15 → 6, emergency braking 9 → 5. Under x3 load with single writes, telemetry falls 11–24 s behind while the incident loop stays at ~200 ms.
+
+After the load test, restart the sim before the next live run (demand takes minutes to fall back).
 
 ## Questions to expect
 

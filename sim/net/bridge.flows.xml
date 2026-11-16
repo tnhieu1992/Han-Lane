@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+  <flow id="bridge0" type="mix" begin="0" end="86400" period="exp(1.0)" from="295128796#0" via="295386151" to="693885802#2" departLane="best" departSpeed="max"/>
+  <flow id="bridge1" type="mix" begin="0" end="86400" period="exp(0.25)" from="295128790#4" via="199383481" to="295386150#0" departLane="best" departSpeed="max"/>
+</routes>

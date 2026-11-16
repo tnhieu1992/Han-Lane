@@ -1,0 +1,14 @@
+{
+  "name": "[HanLane] Gateway receives no requests",
+  "type": "query alert",
+  "query": "sum(last_1m):sum:trace.fastapi.request.hits{service:hanlane-gateway,env:hackathon}.as_count() < 1",
+  "message": "No FastAPI requests reached hanlane-gateway. The ingest path is down (gateway stopped, or sim-bridge not sending).",
+  "options": {
+    "thresholds": { "critical": 1 },
+    "notify_no_data": true,
+    "no_data_timeframe": 2,
+    "include_tags": false
+  },
+  "tags": ["service:hanlane-gateway", "env:hackathon", "team:hanlane"],
+  "priority": 2
+}

@@ -1,0 +1,13 @@
+{
+  "name": "[HanLane] Gateway error rate above 1%",
+  "type": "query alert",
+  "query": "sum(last_5m):sum:trace.fastapi.request.errors{service:hanlane-gateway,env:hackathon}.as_count() / sum:trace.fastapi.request.hits{service:hanlane-gateway,env:hackathon}.as_count() > 0.01",
+  "message": "Gateway APM error rate is {{value}} over 5 minutes. Look at error traces of hanlane-gateway.",
+  "options": {
+    "thresholds": { "critical": 0.01, "warning": 0.005 },
+    "notify_no_data": false,
+    "include_tags": false
+  },
+  "tags": ["service:hanlane-gateway", "env:hackathon", "team:hanlane"],
+  "priority": 3
+}

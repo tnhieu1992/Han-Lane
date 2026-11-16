@@ -1,0 +1,20 @@
+{
+  "name": "[HanLane] Feedback loop p95 under 1 s",
+  "type": "time_slice",
+  "description": "Time-slice SLO: every minute, p95 of hanlane.loop.latency_ms (t5 - t0, measured in sim-bridge, probes included) must be under 1000 ms. Target: 99% of minutes. V2N hazard warnings per 3GPP TS 22.185 allow up to 1000 ms.",
+  "sli_specification": {
+    "time_slice": {
+      "query": {
+        "formulas": [{ "formula": "query1" }],
+        "queries": [
+          { "data_source": "metrics", "name": "query1", "query": "p95:hanlane.loop.latency_ms{env:hackathon}" }
+        ]
+      },
+      "comparator": "<",
+      "threshold": 1000,
+      "query_interval_seconds": 60
+    }
+  },
+  "thresholds": [{ "timeframe": "7d", "target": 99.0, "warning": 99.5 }],
+  "tags": ["service:hanlane", "env:hackathon", "team:hanlane"]
+}

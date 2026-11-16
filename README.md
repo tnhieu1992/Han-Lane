@@ -35,8 +35,10 @@ every Python service --> Datadog Agent (APM, DogStatsD, logs)
 | `insert_many` of 50 docs | p50 145 ms, p95 227 ms |
 | Write ceiling | ~100 documents/s regardless of batching (`docs/measure_m0*.json`) |
 | Telemetry on disk | ~249 bytes per record including indexes |
+| A/B, same incident and seed (52 vehicles behind) | harsh braking 15 → 6, emergency braking 9 → 5, 0 collisions |
+| Load x3 + `WRITE_MODE=single` | telemetry writes fall 11–24 s behind and drop batches; incident loop p95 stays ~200 ms |
 
-Details and the reasoning behind each choice: `docs/decisions.md`. A/B results: `docs/ab_results.md`.
+All measurements: `docs/results.md`. Reasoning behind each choice: `docs/decisions.md`. Limits: `docs/known-issues.md`. Demo script: `docs/demo.md`.
 
 ## Run it
 
@@ -62,6 +64,7 @@ Same actions from the terminal: `make incident`, `make clear`.
 ```bash
 make dd-apply            # percentiles, SLO, dashboard, monitors from datadog/*.json (needs DD_APP_KEY)
 make dd-status           # monitor states
+.venv/bin/python -m common.envrun cli .venv/bin/python scripts/dd_apply.py --prune   # also delete monitors removed from the repo
 ```
 
 Percentiles on distribution metrics only exist from the moment they are enabled, so run `make dd-apply` early. Never edit the dashboard or monitors in the UI; change the JSON and re-apply.

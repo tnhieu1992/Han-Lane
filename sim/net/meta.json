@@ -1,0 +1,24 @@
+{
+  "incident_edge": "295386151",
+  "bridge_edges": [
+    "295386151",
+    "199383481",
+    "199383481-AddedOnRampEdge",
+    "295386151-AddedOffRampEdge",
+    "199383481-AddedOffRampEdge",
+    "295386151-AddedOnRampEdge"
+  ],
+  "bridge_flows": [
+    {
+      "bridge_edge": "295386151",
+      "from": "295128796#0",
+      "to": "693885802#2"
+    },
+    {
+      "bridge_edge": "199383481",
+      "from": "295128790#4",
+      "to": "295386150#0"
+    }
+  ],
+  "flows_file": "sim/net/bridge.flows.xml"
+}

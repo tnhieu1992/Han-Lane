@@ -1,0 +1,14 @@
+# Tail JSON logs written by HanLane processes running on the host (logs/<service>.log).
+logs:
+  - type: file
+    path: /hanlane-logs/hanlane-sim.log
+    service: hanlane-sim
+    source: python
+  - type: file
+    path: /hanlane-logs/hanlane-gateway.log
+    service: hanlane-gateway
+    source: python
+  - type: file
+    path: /hanlane-logs/hanlane-worker.log
+    service: hanlane-worker
+    source: python
